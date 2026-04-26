@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const GRADE_POINTS = { A1: 80, B2: 72, B3: 67, C4: 62, C5: 57, C6: 52 };
 const GRADES = ["A1","B2","B3","C4","C5","C6"];
@@ -26,6 +26,13 @@ export default function FutaAggregateCalculator() {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const jambNum = parseFloat(jamb);
   const jambPreview = (!isNaN(jambNum) && jambNum >= 0 && jambNum <= 400)
@@ -94,17 +101,68 @@ export default function FutaAggregateCalculator() {
         }
         html { scroll-behavior: smooth; }
         body { min-height: 100vh; background: var(--bg); font-family: 'Space Grotesk', sans-serif; color: var(--text); padding-bottom: 60px; }
-        header { background: linear-gradient(180deg, #040B12 0%, #081525 100%); border-bottom: 1px solid var(--border); padding: 30px 20px 24px; text-align: center; position: relative; overflow: hidden; }
-        header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,194,124,0.08) 0%, transparent 70%); pointer-events: none; }
-        .logo-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px; }
-        .logo-icon { width: 40px; height: 40px; border-radius: 11px; background: linear-gradient(135deg, var(--green), #00956A); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 800; color: #fff; box-shadow: 0 4px 16px rgba(0,194,124,0.35); flex-shrink: 0; }
+        
+        /* NAVBAR - NEW */
+        .navbar {
+          position: fixed;
+          top: 0; left: 0; right: 0;
+          height: 64px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 18px;
+          z-index: 1000;
+          transition: all 0.3s ease;
+          background: transparent;
+          border-bottom: 1px solid transparent;
+        }
+        .navbar.scrolled {
+          background: rgba(6,13,20,0.75);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid var(--border);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+        .navbar .logo-row {
+          display: flex; align-items: center; gap: 10px; margin-bottom: 0;
+        }
+        .logo-icon {
+          width: 38px; height: 38px; border-radius: 11px;
+          background: linear-gradient(135deg, var(--green), #00956A);
+          display: flex; align-items: center; justify-content: center;
+          font-family: 'Sora', sans-serif;
+          font-size: 14px; font-weight: 800; color: #fff;
+          box-shadow: 0 4px 16px rgba(0,194,124,0.35);
+          flex-shrink: 0;
+        }
         .logo-text { text-align: left; }
-        .academy-name { font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--green); line-height: 1; }
-        .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
-        h1 { font-family: 'Sora', sans-serif; font-size: clamp(24px, 7vw, 34px); font-weight: 800; line-height: 1.15; color: #fff; margin-bottom: 6px; }
+        .academy-name {
+          font-family: 'Sora', sans-serif;
+          font-size: 10px; font-weight: 700;
+          letter-spacing: 2.5px; text-transform: uppercase;
+          color: var(--green); line-height: 1;
+        }
+        .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 1px; }
+        .nav-menu {
+          width: 40px; height: 40px; border-radius: 10px;
+          background: var(--surface2); border: 1px solid var(--border);
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer;
+        }
+
+        header {
+          background: linear-gradient(180deg, #040B12 0%, #081525 100%);
+          border-bottom: 1px solid var(--border);
+          padding: 104px 20px 24px;
+          text-align: center;
+          position: relative;
+          overflow: hidden;
+        }
+        header::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,194,124,0.08) 0%, transparent 70%); pointer-events: none; }
+        h1 { font-family: 'Sora', sans-serif; font-size: clamp(26px, 7vw, 36px); font-weight: 800; line-height: 1.15; color: #fff; margin-bottom: 8px; }
         h1 em { font-style: normal; color: var(--gold); }
         .header-sub { font-size: 12px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
-        .by-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--green-dim); border: 1px solid rgba(0,194,124,0.3); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--green); font-weight: 600; letter-spacing: 0.5px; }
+        .by-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--green-dim); border: 1px solid rgba(0,194,124,0.3); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--green); font-weight: 600; letter-spacing: 0.3px; }
         .by-badge::before { content: '●'; font-size: 7px; }
         .container { max-width: 480px; margin: 0 auto; padding: 0 14px; }
         .formula-strip { margin-top: 18px; background: var(--gold-dim); border: 1px solid rgba(240,165,0,0.2); border-radius: var(--radius); padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
@@ -158,7 +216,8 @@ export default function FutaAggregateCalculator() {
       `}</style>
 
       <div style={{background:'var(--bg)', minHeight:'100vh', paddingBottom:'60px'}}>
-        <header>
+        {/* STICKY GLASS NAVBAR */}
+        <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
           <div className="logo-row">
             <div className="logo-icon">PS</div>
             <div className="logo-text">
@@ -166,8 +225,18 @@ export default function FutaAggregateCalculator() {
               <div className="logo-sub">ACADEMY</div>
             </div>
           </div>
+          <div className="nav-menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5E8A9E" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </div>
+        </nav>
+
+        <header>
           <h1>FUTA Aggregate <em>Calculator</em></h1>
-          <div className="header-sub">2025/2026 Admission Screening</div>
+          <div className="header-sub">2026/2027 ADMISSION SCREENING</div>
           <div className="by-badge">by OMOJ</div>
         </header>
 
@@ -285,7 +354,7 @@ export default function FutaAggregateCalculator() {
             </div>
           </div>
 
-          <footer><b>The Pace Setter Academy</b> · by OMOJ<br/>FUTA 2025/2026 Admission Season</footer>
+          <footer><b>The Pace Setter Academy</b> · by OMOJ<br/>FUTA 2026/2027 Admission Season<br/><span style={{color:"var(--green)", fontWeight:600}}>built by Resolute Femi</span></footer>
         </div>
       </div>
     </>
